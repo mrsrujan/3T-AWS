@@ -1,9 +1,0 @@
-workflow-aggregator
-git
-github
-github-branch-source
-pipeline-stage-view
-blueocean
-credentials-binding
-timestamper
-ws-cleanup

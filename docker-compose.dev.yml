@@ -13,7 +13,6 @@ services:
       - ./backend/app:/app/app
     environment:
       - STOCKS_DATABASE_URL=sqlite:////data/stocks.db
-      - STOCKS_KIMCHI_API_KEY=${STOCKS_KIMCHI_API_KEY:-}
     restart: unless-stopped
 
   frontend:

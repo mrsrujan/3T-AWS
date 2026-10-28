@@ -116,14 +116,3 @@ app.include_router(holdings.router)
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok"}
-
-
-@app.get("/api/debug/scheduler")
-def scheduler_state() -> dict:
-    return {
-        "running": scheduler.running,
-        "jobs": [
-            {"id": job.id, "next_run_time": str(job.next_run_time)}
-            for job in scheduler.get_jobs()
-        ],
-    }

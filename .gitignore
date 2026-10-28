@@ -22,7 +22,9 @@ Thumbs.db
 .vscode/
 .idea/
 
-#others
+# Local docs — not pushed to GitHub
+workflow.md
+project.docx
 step-by-step.docx
 
 # Claude Code internal state

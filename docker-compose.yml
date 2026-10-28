@@ -37,9 +37,6 @@ services:
       # refreshes without wiring external cron. In K8s we set this to false
       # because CronJobs own the scheduled work.
       STOCKS_SCHEDULER_ENABLED: "true"
-      STOCKS_ANTHROPIC_API_KEY: ${STOCKS_ANTHROPIC_API_KEY:-}
-      STOCKS_GROQ_API_KEY: ${STOCKS_GROQ_API_KEY:-}
-      STOCKS_KIMCHI_API_KEY: ${STOCKS_KIMCHI_API_KEY:-}
     ports:
       - "8011:8000"
     depends_on:

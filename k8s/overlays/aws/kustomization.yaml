@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: stockmantra
+
+resources:
+  - ../../base
+
+# Image names are rewritten here at CI time by:
+#   kustomize edit set image stockmantra-backend:phase2=<ECR_URL>:<SHA>
+# The placeholders below are overwritten by that command — do not hand-edit.
+images:
+  - name: stockmantra-backend:phase2
+    newName: stockmantra-backend
+    newTag: phase2
+  - name: stockmantra-frontend:phase2
+    newName: stockmantra-frontend
+    newTag: phase2
+
+patches:
+  - target:
+      kind: Ingress
+      name: stockmantra
+    patch: |-
+      - op: replace
+        path: /metadata/annotations
+        value:
+          alb.ingress.kubernetes.io/scheme: internet-facing
+          alb.ingress.kubernetes.io/target-type: ip
+          alb.ingress.kubernetes.io/load-balancer-name: stockmantra
+      - op: replace
+        path: /spec/ingressClassName
+        value: alb
+      - op: replace
+        path: /spec/rules
+        value:
+          - http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: frontend
+                      port:
+                        number: 80

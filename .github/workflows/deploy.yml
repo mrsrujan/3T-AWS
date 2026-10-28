@@ -1,0 +1,90 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # also allows manual trigger from GitHub UI
+
+env:
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: SM-EKS
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/stockmantra-backend:$IMAGE_TAG ./backend
+          docker push $REGISTRY/stockmantra-backend:$IMAGE_TAG
+
+      - name: Build and push frontend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/stockmantra-frontend:$IMAGE_TAG ./frontend
+          docker push $REGISTRY/stockmantra-frontend:$IMAGE_TAG
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+
+      # Generate secret.yaml at runtime from GitHub Secrets so kustomize can
+      # find it (the real file is .gitignored and never committed).
+      - name: Generate k8s/base/secret.yaml
+        run: |
+          kubectl create secret generic stockmantra-secrets \
+            --namespace=stockmantra \
+            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
+            --dry-run=client -o yaml > k8s/base/secret.yaml
+
+      - name: Set image tags in overlay
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd k8s/overlays/aws
+          kustomize edit set image \
+            stockmantra-backend:phase2=$REGISTRY/stockmantra-backend:$IMAGE_TAG \
+            stockmantra-frontend:phase2=$REGISTRY/stockmantra-frontend:$IMAGE_TAG
+
+      - name: Apply manifests
+        run: kubectl apply -k k8s/overlays/aws
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/api      -n stockmantra --timeout=5m
+          kubectl rollout status deployment/frontend -n stockmantra --timeout=5m
+
+      - name: Show app URL
+        run: |
+          echo "Waiting up to 60s for ALB DNS to appear..."
+          for i in $(seq 1 12); do
+            URL=$(kubectl get ingress stockmantra -n stockmantra \
+                  -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
+            if [ -n "$URL" ]; then
+              echo "App is live at: http://$URL"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "ALB not ready yet — run: kubectl get ingress -n stockmantra"

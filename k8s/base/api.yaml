@@ -76,21 +76,6 @@ spec:
                   key: POSTGRES_PASSWORD
             - name: STOCKS_DATABASE_URL
               value: postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
-            - name: STOCKS_ANTHROPIC_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: stockmantra-secrets
-                  key: STOCKS_ANTHROPIC_API_KEY
-            - name: STOCKS_GROQ_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: stockmantra-secrets
-                  key: STOCKS_GROQ_API_KEY
-            - name: STOCKS_KIMCHI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: stockmantra-secrets
-                  key: STOCKS_KIMCHI_API_KEY
           readinessProbe:
             httpGet:
               path: /api/health

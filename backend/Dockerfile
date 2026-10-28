@@ -32,12 +32,10 @@ FROM python:3.11-slim
 
 # Runtime deps:
 # - ca-certificates for HTTPS to Yahoo Finance / NSE / Google News
-# - libgomp1 for lightgbm (OpenMP)
 # - curl for container healthchecks and quick ops debugging
 # - tzdata for APScheduler CronTrigger(timezone=...) on local dev
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
-    libgomp1 \
     curl \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
