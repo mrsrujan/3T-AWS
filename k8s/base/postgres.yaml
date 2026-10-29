@@ -82,6 +82,7 @@ spec:
         name: data
       spec:
         accessModes: ["ReadWriteOnce"]
+        storageClassName: ebs-gp3
         resources:
           requests:
             storage: 10Gi

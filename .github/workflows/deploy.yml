@@ -57,6 +57,13 @@ jobs:
             --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
             --dry-run=client -o yaml > k8s/base/secret.yaml
 
+      - name: Install kustomize
+        run: |
+          curl -sLo kustomize.tar.gz \
+            "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz"
+          tar -xzf kustomize.tar.gz
+          sudo mv kustomize /usr/local/bin/kustomize
+
       - name: Set image tags in overlay
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}

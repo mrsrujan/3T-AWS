@@ -5,6 +5,7 @@ namespace: stockmantra
 
 resources:
   - ../../base
+  - storageclass.yaml
 
 # Image names are rewritten here at CI time by:
 #   kustomize edit set image stockmantra-backend:phase2=<ECR_URL>:<SHA>

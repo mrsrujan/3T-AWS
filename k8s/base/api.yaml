@@ -49,13 +49,13 @@ spec:
           env:
             - name: TZ
               value: Asia/Kolkata
-            - name: POSTGRES_PASSWORD
+            - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
                   name: stockmantra-secrets
                   key: POSTGRES_PASSWORD
             - name: STOCKS_DATABASE_URL
-              value: postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+              value: postgresql+psycopg://stockmantra@postgres:5432/stockmantra
       containers:
         - name: api
           image: stockmantra-backend:phase2
@@ -69,13 +69,13 @@ spec:
           env:
             - name: TZ
               value: Asia/Kolkata
-            - name: POSTGRES_PASSWORD
+            - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
                   name: stockmantra-secrets
                   key: POSTGRES_PASSWORD
             - name: STOCKS_DATABASE_URL
-              value: postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+              value: postgresql+psycopg://stockmantra@postgres:5432/stockmantra
           readinessProbe:
             httpGet:
               path: /api/health
