@@ -11,6 +11,7 @@ from app.db import Base, SessionLocal, engine
 from app.models import TradingCalendar
 from app.routers import (
     holdings,
+    ipo,
     news,
     rankings,
     refresh,
@@ -104,6 +105,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(ipo.router)
 app.include_router(news.router)
 app.include_router(rankings.router)
 app.include_router(refresh.router)

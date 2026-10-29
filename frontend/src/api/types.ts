@@ -1,5 +1,33 @@
 export type Market = "IN";
 
+export interface UpcomingIpo {
+  company_name: string;
+  symbol: string | null;
+  open_date: string | null;
+  close_date: string | null;
+  listing_date: string | null;
+  price_band: string | null;
+  lot_size: string | null;
+  category: string;
+  status: string;
+}
+
+export interface RecentIpo {
+  company_name: string;
+  symbol: string | null;
+  listing_date: string | null;
+  issue_price: number | null;
+  listing_price: number | null;
+  current_price: number | null;
+  gain_pct: number | null;
+  category: string;
+}
+
+export interface IpoResponse {
+  upcoming: UpcomingIpo[];
+  recent: RecentIpo[];
+}
+
 export interface NewsArticle {
   title: string;
   link: string;

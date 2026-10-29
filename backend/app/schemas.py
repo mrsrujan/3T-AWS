@@ -7,6 +7,34 @@ from pydantic import BaseModel
 Market = str  # "IN"
 
 
+class UpcomingIpo(BaseModel):
+    company_name: str
+    symbol: str | None = None
+    open_date: str | None = None
+    close_date: str | None = None
+    listing_date: str | None = None
+    price_band: str | None = None
+    lot_size: str | None = None
+    category: str = "Main Board"
+    status: str = "Upcoming"
+
+
+class RecentIpo(BaseModel):
+    company_name: str
+    symbol: str | None = None
+    listing_date: str | None = None
+    issue_price: float | None = None
+    listing_price: float | None = None
+    current_price: float | None = None
+    gain_pct: float | None = None
+    category: str = "Main Board"
+
+
+class IpoResponse(BaseModel):
+    upcoming: list[UpcomingIpo]
+    recent: list[RecentIpo]
+
+
 class NewsArticle(BaseModel):
     title: str
     link: str

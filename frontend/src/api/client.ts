@@ -20,6 +20,7 @@ import type {
   RankingType,
   RankingsResponse,
   StreakResponse,
+  IpoResponse,
 } from "./types";
 
 import { getApiBaseUrlOverride } from "../lib/preferences";
@@ -158,6 +159,10 @@ export function sellHolding(id: number, sellPrice: number, sellDate: string): Pr
 
 export function getMarketNews(market: Market, limit = 20): Promise<MarketNewsResponse> {
   return request(`/api/news/market?market=${market}&limit=${limit}`);
+}
+
+export function getIpos(market: Market): Promise<IpoResponse> {
+  return request(`/api/ipo?market=${market}`);
 }
 
 export function getLiveQuote(market: Market, symbol: string): Promise<LiveQuoteResponse> {

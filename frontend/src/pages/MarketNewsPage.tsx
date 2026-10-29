@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMarket } from "../context/MarketContext";
 import { useMarketNews } from "../hooks/useMarketNews";
+import { useIpos } from "../hooks/useIpos";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { ErrorBanner } from "../components/common/ErrorBanner";
 import { EmptyState } from "../components/common/EmptyState";
+import { IpoSection } from "../components/ipo/IpoSection";
 import type { MarketNewsArticle } from "../api/types";
 
 type ArticleCategory = "earnings" | "market-move" | "analysis" | "policy" | "corporate" | "other";
@@ -293,6 +295,7 @@ function TopicFilter({
 export function MarketNewsPage() {
   const { market } = useMarket();
   const { data, isLoading, error } = useMarketNews(market, 40);
+  const { data: ipoData, isLoading: ipoLoading } = useIpos(market);
   const [activeFilter, setActiveFilter] = useState<ArticleCategory | "all">("all");
 
   const enriched: Enriched[] = (data?.articles ?? []).map((a) => ({ ...a, _cat: classify(a.title) }));
@@ -377,6 +380,14 @@ export function MarketNewsPage() {
           </div>
         </div>
       )}
+
+      {/* ── IPO Tracker ───────────────────────────────────── */}
+      <IpoSection
+        upcoming={ipoData?.upcoming ?? []}
+        recent={ipoData?.recent ?? []}
+        market={market}
+        isLoading={ipoLoading}
+      />
     </div>
   );
 }
